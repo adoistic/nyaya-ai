@@ -1,0 +1,51 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # run manually from the Actions tab
+  schedule:
+    - cron: "0 6 * * *"     # daily refresh of episodes.json (06:00 UTC)
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment; don't cancel an in-progress one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Build episodes.json from the public podcast RSS feed.
+      # No secrets, no token — just the feed URL. If the fetch fails, the
+      # site falls back to the embedded Spotify player.
+      - name: Build episodes from RSS
+        run: node scripts/fetch-episodes.mjs
+
+      - uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .          # publish the repo root (index.html + episodes.json)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
