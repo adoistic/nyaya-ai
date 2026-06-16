@@ -451,7 +451,7 @@
         <p class="meta rv" data-d="1">Every episode, newest first. Hover to read the brief; click to hear the argument.</p>
       </div>
       <div id="episodes-status">Loading the record…</div>
-      <div class="docket" id="docket"></div>
+      <div class="docket" id="docketList"></div>
     </div>
   </section>
 
@@ -626,7 +626,7 @@
 
         /* docket = all */
         const total = eps.length;
-        document.getElementById("docket").innerHTML = eps.map((e,i)=>`
+        document.getElementById("docketList").innerHTML = eps.map((e,i)=>`
           <div class="ep-row" data-idx="${i}" data-img="${esc(e.image||"")}" role="button" tabindex="0" data-cursor>
             <span class="ep-num">${num(total-i)}</span>
             <span class="ep-main">
